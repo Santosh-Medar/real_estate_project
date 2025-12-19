@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BUILD - Seller Dashboard</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            /* Theme Colors */
+            --primary-text: #0f172a;
+            --secondary-text: #64748b;
+            --accent-black: #1a1a1a;
+            --danger-red: #ef4444;
+            --bg-gradient: linear-gradient(135deg, #C1DEE8 0%, #FBD9B9 100%);
+            
+            /* Glassmorphism Variables */
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.5);
+            --card-hover-shadow: 0 12px 40px rgba(0,0,0,0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-gradient);
+            color: var(--primary-text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- Header --- */
+        .header {
+            height: 70px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            border-bottom: var(--glass-border);
+            padding: 0 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+        }
+
+        .logo {
+            font-size: 1.4rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: var(--primary-text);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav {
+            display: flex;
+            gap: 24px;
+        }
+
+        .nav a {
+            text-decoration: none;
+            color: var(--secondary-text);
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav a:hover, .nav a.active {
+            color: var(--accent-black);
+            font-weight: 600;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .notification-btn {
+            background: white;
+            border: 1px solid rgba(0,0,0,0.05);
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            color: var(--secondary-text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .notification-btn:hover {
+            color: var(--accent-black);
+            transform: scale(1.05);
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            border: 2px solid white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .user-avatar::after {
+            content: '';
+            display: block;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://ui-avatars.com/api/?name=Seller+Pro&background=1a1a1a&color=fff');
+            background-size: cover;
+        }
+
+        /* --- Dashboard Header (Title + Add Button) --- */
+        .dashboard-header {
+            padding: 32px 32px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 20px;
+        }
+
+        .dashboard-title h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary-text);
+            margin-bottom: 8px;
+        }
+
+        .dashboard-title p {
+            color: var(--secondary-text);
+            font-size: 0.95rem;
+        }
+
+        .add-property-btn {
+            background: var(--accent-black);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.2s;
+        }
+
+        .add-property-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+            background: #000;
+        }
+
+        /* --- Seller Search Toolbar --- */
+        .seller-toolbar {
+            padding: 0 32px;
+            margin-bottom: 24px;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .search-bar-container {
+            display: flex;
+            align-items: center;
+            background: white;
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 8px;
+            padding: 8px 16px;
+            width: 400px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+            transition: all 0.2s;
+        }
+
+        .search-bar-container:focus-within {
+            border-color: var(--accent-black);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .search-bar-container svg {
+            width: 18px;
+            height: 18px;
+            color: #94a3b8;
+            margin-right: 12px;
+        }
+
+        .search-input {
+            border: none;
+            outline: none;
+            font-size: 14px;
+            width: 100%;
+            font-family: 'Inter', sans-serif;
+            color: var(--primary-text);
+        }
+
+        .filter-select {
+            padding: 10px 16px;
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 8px;
+            background: white;
+            font-size: 14px;
+            color: var(--primary-text);
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            outline: none;
+        }
+
+        /* --- Listings Grid --- */
+        .listings-container {
+            padding: 0 32px 40px;
+            flex: 1; 
+        }
+
+        .properties-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 24px;
+        }
+
+        /* --- Property Card --- */
+        .property-card {
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(255,255,255,0.6);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            position: relative;
+            backdrop-filter: blur(5px);
+        }
+
+        .property-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--card-hover-shadow);
+            background: white;
+        }
+
+        .card-image {
+            position: relative;
+            height: 220px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .property-card:hover .card-image img {
+            transform: scale(1.05);
+        }
+
+        .card-status {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: rgba(255, 255, 255, 0.95);
+            color: var(--accent-black);
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .card-content {
+            padding: 20px;
+        }
+
+        .card-price {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--primary-text);
+            margin-bottom: 4px;
+        }
+
+        .card-location {
+            font-size: 0.95rem;
+            color: var(--secondary-text);
+            margin-bottom: 16px;
+            font-weight: 500;
+        }
+
+        .property-stats {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+            font-size: 0.85rem;
+            color: var(--secondary-text);
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .stat-icon {
+            width: 16px;
+            height: 16px;
+            color: #94a3b8;
+        }
+
+        .seller-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-view {
+            flex: 1;
+            background: var(--accent-black);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .btn-view:hover {
+            opacity: 0.9;
+        }
+
+        .btn-icon {
+            width: 42px;
+            height: 42px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            color: var(--secondary-text);
+        }
+
+        .btn-edit:hover {
+            border-color: var(--accent-black);
+            color: var(--accent-black);
+        }
+
+        .btn-delete:hover {
+            border-color: var(--danger-red);
+            color: var(--danger-red);
+            background: #fef2f2;
+        }
+
+        /* --- Footer --- */
+        .footer {
+            background: var(--accent-black);
+            color: white;
+            padding: 40px 32px 24px;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            max-width: 1400px;
+            margin: 0 auto 32px;
+        }
+
+        .footer-logo {
+            font-size: 24px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="header-left">
+            <a href="#" class="logo">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H7v-2h5v2zm0-4H7v-2h5v2zm0-4H7V7h5v2zm5 8h-3v-2h3v2zm0-4h-3v-2h3v2zm0-4h-3V7h3v2z"/>
+                </svg>
+                <span>BUILD</span>
+            </a>
+            <nav class="nav">
+           
+            </nav>
+        </div>
+        <div class="header-right">
+            <button class="notification-btn" title="Notifications">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+            </button>
+            <div class="user-avatar"></div>
+        </div>
+    </header>
+
+    <div class="dashboard-header">
+        <div class="dashboard-title">
+            <h1>My Properties</h1>
+            <p>Manage your active listings and sales</p>
+        </div>
+        <button class="add-property-btn" onclick="window.location.href='/property/add/'">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            Add New Property
+        </button>
+    </div>
+
+    <div class="seller-toolbar">
+        <div class="search-bar-container">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" class="search-input" placeholder="Search your properties by address...">
+        </div>
+        
+        <select class="filter-select">
+            <option>All Status</option>
+            <option>Active</option>
+            <option>Pending</option>
+            <option>Sold</option>
+        </select>
+        
+        <select class="filter-select">
+            <option>Newest First</option>
+            <option>Oldest First</option>
+            <option>Price: High to Low</option>
+        </select>
+    </div>
+
+    <div class="listings-container">
+        <div class="properties-grid" id="sellerGrid">
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div>
+                <div class="footer-logo">
+                    <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24" style="color:white; margin-right: 8px;"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H7v-2h5v2zm0-4H7v-2h5v2zm0-4H7V7h5v2zm5 8h-3v-2h3v2zm0-4h-3v-2h3v2zm0-4h-3V7h3v2z"/></svg>
+                    BUILD
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <div class="footer-links">
+                    <a href="#">Home</a>
+                    <a href="#">About Us</a>
+                    <a href="#">Blog</a>
+                    <a href="#">Contact</a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3>Support</h3>
+                <div class="footer-links">
+                    <a href="#">Help Center</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Privacy Policy</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            © 2025 BUILD All rights reserved.
+        </div>
+    </footer>
+
+    <script>
+        async function fetchProperties() {
+            const response = await fetch("/api/seller/properties/");
+            return await response.json();
+        }
+
+        async function deleteProperty(id, btnElement) {
+            if (!confirm("Are you sure you want to delete this property?")) return;
+
+            const response = await fetch(`/api/properties/delete/${id}/`, {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": getCSRFToken(),
+                }
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                const card = btnElement.closest(".property-card");
+                card.style.opacity = "0";
+                setTimeout(() => card.remove(), 300);
+            } else {
+                alert("Error deleting property: " + data.error);
+            }
+        }
+
+
+        async function renderSellerProperties() {
+            const grid = document.getElementById('sellerGrid');
+            const myProperties = await fetchProperties(); 
+
+            myProperties.forEach(prop => {
+                const card = document.createElement('div');
+                card.className = 'property-card';
+                card.innerHTML = `
+                    <div class="card-image">
+                        <img src="${prop.image}" alt="Property">
+                        <div class="card-status">${prop.status}</div>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-price">$${prop.price.toLocaleString()}</div>
+                        <div class="card-location">${prop.location}</div>
+                        
+                        <div class="property-stats">
+                            <div class="stat-item">
+                                <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+                                ${prop.beds}
+                            </div>
+                            <div class="stat-item">
+                                <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="6" width="18" height="14" rx="2"></rect></svg>
+                                ${prop.baths}
+                            </div>
+                            <div class="stat-item">
+                                <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="1" y="3" width="22" height="5"></rect></svg>
+                                ${prop.sqft}
+                            </div>
+                        </div>
+
+                        <div class="seller-actions">
+                            <button class="btn-view" onclick="window.location.href='/property/view/${prop.id}/'">
+                                View Details
+                            </button>
+
+                            <button class="btn-icon btn-edit" title="Edit" onclick="window.location.href='/property/edit/${prop.id}/'">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                </svg>
+                            </button>
+                            <form style="display:none">
+                                {% csrf_token %}
+                                <button class="btn-icon btn-delete" title="Delete" onclick="deleteProperty(${prop.id}, this)">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="3 6 5 6 21 6"></polyline>
+                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                    </svg>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function getCSRFToken() {
+            return document.querySelector("[name=csrfmiddlewaretoken]").value;
+        }
+
+        document.addEventListener('DOMContentLoaded', renderSellerProperties);
+    </script>
+</body>
+</html>

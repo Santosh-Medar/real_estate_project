@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BUILD - Admin Dashboard</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-text: #0f172a;
+            --secondary-text: #64748b;
+            --accent-black: #1a1a1a;
+            --danger-red: #ef4444;
+            --success-green: #10b981;
+            --warning-orange: #f59e0b;
+            --bg-gradient: linear-gradient(135deg, #C1DEE8 0%, #FBD9B9 100%);
+            
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.5);
+            --card-hover-shadow: 0 12px 40px rgba(0,0,0,0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-gradient);
+            color: var(--primary-text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- Header --- */
+        .header {
+            height: 70px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            border-bottom: var(--glass-border);
+            padding: 0 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+        }
+
+        .logo {
+            font-size: 1.4rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: var(--primary-text);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav {
+            display: flex;
+            gap: 24px;
+        }
+
+        .nav a {
+            text-decoration: none;
+            color: var(--secondary-text);
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav a:hover, .nav a.active {
+            color: var(--accent-black);
+            font-weight: 600;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .notification-btn {
+            background: white;
+            border: 1px solid rgba(0,0,0,0.05);
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            color: var(--secondary-text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .notification-btn:hover {
+            color: var(--accent-black);
+            transform: scale(1.05);
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            border: 2px solid white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .user-avatar::after {
+            content: '';
+            display: block;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://ui-avatars.com/api/?name=Admin+User&background=000&color=fff');
+            background-size: cover;
+        }
+
+        /* --- Admin Stats Section --- */
+        .stats-container {
+            padding: 32px 32px 24px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 16px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: transform 0.2s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: var(--secondary-text);
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Icon Colors */
+        .stat-card.pending .stat-icon { background: #fff7ed; color: var(--warning-orange); }
+        .stat-card.buyers .stat-icon { background: #eff6ff; color: #3b82f6; }
+        .stat-card.sellers .stat-icon { background: #f0fdf4; color: var(--success-green); }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary-text);
+            margin-top: 8px;
+        }
+
+        .stat-desc {
+            font-size: 0.85rem;
+            color: var(--secondary-text);
+        }
+
+        /* --- Approved Properties Grid --- */
+        .section-title {
+            padding: 0 32px;
+            margin-bottom: 24px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-text);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .count-badge {
+            background: var(--accent-black);
+            color: white;
+            font-size: 0.8rem;
+            padding: 2px 10px;
+            border-radius: 50px;
+            font-weight: 600;
+        }
+
+        .listings-container {
+            padding: 0 32px 40px;
+            flex: 1;
+        }
+
+        .properties-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 24px;
+        }
+
+        /* --- Property Card --- */
+        .property-card {
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(255,255,255,0.6);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            position: relative;
+            backdrop-filter: blur(5px);
+        }
+
+        .property-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--card-hover-shadow);
+            background: white;
+        }
+
+        .card-image {
+            position: relative;
+            height: 200px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .property-card:hover .card-image img {
+            transform: scale(1.05);
+        }
+
+        .card-status {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: var(--success-green);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Card Content */
+        .card-content {
+            padding: 20px;
+        }
+
+        .card-price {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--primary-text);
+            margin-bottom: 4px;
+        }
+
+        .card-location {
+            font-size: 0.95rem;
+            color: var(--secondary-text);
+            margin-bottom: 16px;
+            font-weight: 500;
+        }
+
+        .property-stats {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+            font-size: 0.85rem;
+            color: var(--secondary-text);
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .stat-icon {
+            width: 16px;
+            height: 16px;
+            color: #94a3b8;
+        }
+
+        /* Admin Actions */
+        .admin-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-view {
+            flex: 1;
+            background: white;
+            border: 1px solid #e2e8f0;
+            color: var(--primary-text);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-view:hover {
+            border-color: var(--accent-black);
+        }
+
+        .btn-remove {
+            background: #fee2e2;
+            color: var(--danger-red);
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-remove:hover {
+            background: #fecaca;
+        }
+
+        /* --- Footer --- */
+        .footer {
+            background: var(--accent-black);
+            color: white;
+            padding: 40px 32px 24px;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            max-width: 1400px;
+            margin: 0 auto 32px;
+        }
+
+        .footer-logo {
+            font-size: 24px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="header-left">
+            <a href="#" class="logo">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H7v-2h5v2zm0-4H7v-2h5v2zm0-4H7V7h5v2zm5 8h-3v-2h3v2zm0-4h-3v-2h3v2zm0-4h-3V7h3v2z"/>
+                </svg>
+                <span>BUILD</span>
+            </a>
+            <nav class="nav">
+            </nav>
+        </div>
+        <div class="header-right">
+            <button class="notification-btn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+            </button>
+            <div class="user-avatar"></div>
+        </div>
+    </header>
+
+    <div class="stats-container">
+        <div class="stat-card pending" onclick="window.location.href='{% url 'pending_properties_api' %}'" style="cursor:pointer;">
+            <div class="stat-header">
+                Pending Approval
+                <div class="stat-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                </div>
+            </div>
+            <div class="stat-number">{{data.pending}}</div>
+            <div class="stat-desc">Properties waiting for review</div>
+        </div>
+
+        <div class="stat-card buyers" style="cursor:pointer;">
+            <div class="stat-header">
+                Total Buyers
+                <div class="stat-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                </div>
+            </div>
+            <div class="stat-number">{{data.buyers}}</div>
+            <div class="stat-desc">+0% from last month</div>
+        </div>
+
+        <div class="stat-card sellers" style="cursor:pointer;">
+            <div class="stat-header">
+                Total Sellers
+                <div class="stat-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                </div>
+            </div>
+            <div class="stat-number">{{data.sellers}}</div>
+            <div class="stat-desc">Active property listings</div>
+        </div>
+    </div>
+
+    <div class="section-title">
+        Approved Properties 
+        <span class="count-badge">{{data.approved}} Active</span>
+    </div>
+
+    <div class="listings-container">
+        <div class="properties-grid" id="adminGrid">
+            </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div>
+                <div class="footer-logo">
+                    <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24" style="color:white; margin-right: 8px;"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H7v-2h5v2zm0-4H7v-2h5v2zm0-4H7V7h5v2zm5 8h-3v-2h3v2zm0-4h-3v-2h3v2zm0-4h-3V7h3v2z"/></svg>
+                    BUILD
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <div class="footer-links">
+                    <a href="#">Home</a>
+                    <a href="#">About Us</a>
+                    <a href="#">Blog</a>
+                    <a href="#">Contact</a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3>Support</h3>
+                <div class="footer-links">
+                    <a href="#">Help Center</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Privacy Policy</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            © 2025 BUILD All rights reserved.
+        </div>
+    </footer>
+
+    <script>
+        async function fetchApprovedProperties() {
+            const response = await fetch("/api/admin/properties/approved/");
+            return await response.json();
+        }
+
+        function removeProperty(id, btnElement) {
+            if (confirm("Are you sure you want to move this property back to Pending status?")) {
+
+                fetch(`/api/admin/property/${id}/remove/`, {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": getCookie("csrftoken"),
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({})
+                })
+                .then(response => {
+                    if (response.ok) {
+                        const card = btnElement.closest('.property-card');
+                        card.style.opacity = '0';
+                        setTimeout(() => card.remove(), 300);
+                        location.reload();   
+                    } else {
+                        alert("Failed to update status.");
+                    }
+                })
+                .catch(error => {
+                    alert("Error: " + error);
+                });
+            }
+        }
+        
+        function getCookie(name) {
+            let cookieValue = null;
+            let cookies = document.cookie ? document.cookie.split(';') : [];
+            for (let cookie of cookies) {
+                cookie = cookie.trim();
+                if (cookie.startsWith(name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+            return cookieValue;
+        }
+
+        async function renderAdminProperties() {
+            const grid = document.getElementById('adminGrid');
+            grid.innerHTML = "";
+
+            const approvedProperties = await fetchApprovedProperties();
+            approvedProperties.forEach(prop => {
+                const card = document.createElement('div');
+                card.className = 'property-card';
+                card.innerHTML = `
+                    <div class="card-image">
+                        <img src="${prop.image}" alt="Property">
+                        <div class="card-status">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            Approved
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-price">$${prop.price.toLocaleString()}</div>
+                        <div class="card-location">${prop.location}</div>
+                        
+                        <div class="property-stats">
+                            <div class="stat-item">
+                                <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+                                ${prop.beds}
+                            </div>
+                            <div class="stat-item">
+                                <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="6" width="18" height="14" rx="2"></rect></svg>
+                                ${prop.baths}
+                            </div>
+                            <div class="stat-item">
+                                <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="1" y="3" width="22" height="5"></rect></svg>
+                                ${prop.sqft}
+                            </div>
+                        </div>
+
+                        <div class="admin-actions">
+                            <button class="btn-view" onclick="window.location.href='/property/view/${prop.id}/'">View Details</button>
+                            <button class="btn-remove" title="Remove Listing" onclick="removeProperty(${prop.id}, this)">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                </svg>
+                                Remove
+                            </button>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', renderAdminProperties);
+    </script>
+</body>
+</html>

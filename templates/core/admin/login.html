@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - PropertyHub Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #ffffff;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #1a1a1a;
+        }
+
+        /* Animated Background */
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+            background: linear-gradient(135deg, #faf5ff 0%, #fff7ed 100%);
+        }
+
+        .animated-bg::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(124, 58, 237, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(249, 115, 22, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(59, 130, 246, 0.05) 0%, transparent 50%);
+            animation: bgFloat 20s ease-in-out infinite;
+        }
+
+        @keyframes bgFloat {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(-5%, -5%) rotate(1deg); }
+            66% { transform: translate(5%, 5%) rotate(-1deg); }
+        }
+
+        .grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(124, 58, 237, 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(124, 58, 237, 0.04) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: 0;
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 5%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(124, 58, 237, 0.15);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.05);
+            z-index: 1000;
+            animation: slideDown 0.6s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: #2563eb;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .logo-text {
+            color: #1a1a1a;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .header a {
+            color: #4a4a4a;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .header a:hover {
+            color: #2563eb;
+            transform: translateY(-2px);
+        }
+
+        /* Mobile Menu */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: #1a1a1a;
+            cursor: pointer;
+        }
+
+        /* Login Container */
+        .login-container {
+            margin-top: 85px;
+            min-height: calc(100vh - 85px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 5%;
+            position: relative;
+            z-index: 1;
+        }
+
+        .login-box {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            max-width: 1200px;
+            width: 100%;
+            background: white;
+            border-radius: 25px;
+            overflow: hidden;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(124, 58, 237, 0.15);
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-image {
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.9), rgba(29, 78, 216, 0.9)),
+                        url('https://images.unsplash.com/photo-1640109341881-1cd3eaf50909?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBvZmZpY2UlMjB3b3Jrc3BhY2UlMjBkZXNrfGVufDF8fHx8MTc2MDYxOTUzN3ww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            padding: 60px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-image::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1), transparent);
+            animation: float 15s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(-30px, -30px) rotate(5deg); }
+        }
+
+        .login-image-content {
+            position: relative;
+            z-index: 1;
+            max-width: 100%;
+            animation: fadeInLeft 1s ease-out;
+        }
+
+        @keyframes fadeInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .admin-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 30px;
+            font-size: 14px;
+            color: white;
+            margin-bottom: 25px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(255, 255, 255, 0); }
+        }
+
+        .login-image h1 {
+            font-size: 42px;
+            margin-bottom: 20px;
+            line-height: 1.2;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .login-image p {
+            font-size: 16px;
+            margin-bottom: 30px;
+            opacity: 0.95;
+            line-height: 1.6;
+        }
+
+        .login-features {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+
+        .login-feature {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 16px;
+            animation: fadeInLeft 1s ease-out;
+        }
+
+        .login-feature:nth-child(1) { animation-delay: 0.2s; opacity: 0; animation-fill-mode: forwards; }
+        .login-feature:nth-child(2) { animation-delay: 0.4s; opacity: 0; animation-fill-mode: forwards; }
+        .login-feature:nth-child(3) { animation-delay: 0.6s; opacity: 0; animation-fill-mode: forwards; }
+
+        .check-icon {
+            width: 24px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .login-form-container {
+            padding: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: white;
+            height: 100%;
+            animation: fadeInRight 1s ease-out;
+        }
+
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .form-header h2 {
+            font-size: 32px;
+            color: #1a1a1a;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .form-header p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .login-form {
+            width: 100%;
+        }
+
+        /* Form Styles - Preserving Django functionality */
+        form p {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        form label {
+            display: block;
+            margin-bottom: 8px;
+            color: #1a1a1a;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        form input, form select, form textarea {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #f9fafb;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        form input:focus, form select:focus, form textarea:focus {
+            outline: none;
+            border-color: #2563eb;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        form .helptext {
+            display: block;
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        form .errorlist {
+            color: #dc2626;
+            font-size: 14px;
+            margin-top: 5px;
+            list-style: none;
+        }
+
+        form .errorlist li {
+            background: #fef2f2;
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-bottom: 5px;
+            border-left: 4px solid #dc2626;
+        }
+
+        button {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+            margin-top: 10px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+            background: linear-gradient(135deg, #1d4ed8, #1e40af);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .form-footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .form-footer a {
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .form-footer a:hover {
+            color: #1d4ed8;
+            text-decoration: underline;
+        }
+
+        /* Footer */
+        .footer {
+            padding: 40px 5% 20px;
+            background: #1a1a1a;
+            color: white;
+            margin-top: auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto 30px;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 15px;
+            font-size: 18px;
+            color: #2563eb;
+        }
+
+        .footer-section p,
+        .footer-section a {
+            color: #999;
+            text-decoration: none;
+            line-height: 2;
+            transition: color 0.3s ease;
+            font-size: 14px;
+        }
+
+        .footer-section a:hover {
+            color: #2563eb;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #333;
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* Responsive */
+        @media (max-width: 968px) {
+            .login-box {
+                grid-template-columns: 1fr;
+                max-width: 500px;
+            }
+
+            .login-image {
+                padding: 40px;
+                min-height: 300px;
+            }
+
+            .login-image h1 {
+                font-size: 32px;
+            }
+
+            .login-form-container {
+                padding: 40px;
+            }
+
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 70px;
+                left: 0;
+                right: 0;
+                background: rgba(255, 255, 255, 0.98);
+                flex-direction: column;
+                padding: 20px;
+                border-bottom: 1px solid rgba(124, 58, 237, 0.2);
+                box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .login-image {
+                padding: 30px;
+            }
+            
+            .login-form-container {
+                padding: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="animated-bg"></div>
+    <div class="grid-overlay"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <div class="logo-icon">🏡</div>
+            <span class="logo-text"> PropertyZone</span>
+        </div>
+        <button class="mobile-menu-btn" onclick="toggleMenu()">☰</button>
+       
+    </header>
+
+    <!-- Login Container -->
+    <div class="login-container">
+        <div class="login-box">
+            <div class="login-image">
+                <div class="login-image-content">
+                    <div class="admin-badge">
+                        <span>🔐</span>
+                        <span>Administrative Access</span>
+                    </div>
+                    <h1>Secure Admin Portal</h1>
+                    <p>Access the comprehensive admin dashboard to manage platform operations with complete control and security.</p>
+                    
+                    <div class="login-features">
+                        <div class="login-feature">
+                            <span class="check-icon">✓</span>
+                            <span>Full platform management capabilities</span>
+                        </div>
+                        <div class="login-feature">
+                            <span class="check-icon">✓</span>
+                            <span>Real-time analytics and insights</span>
+                        </div>
+                        <div class="login-feature">
+                            <span class="check-icon">✓</span>
+                            <span>Enterprise-grade security measures</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="login-form-container">
+                <div class="form-header">
+                    <h2>Admin Login</h2>
+                    <p>Enter your credentials to access the admin dashboard</p>
+                </div>
+
+                <form method="POST" class="login-form" action="{% url 'admin_login' %}">
+                    {% csrf_token %}
+
+                    {% if error %}
+                        <p style="color: red;">{{ error }}</p>
+                    {% endif %}
+
+                    <input type="text" name="username" placeholder="Username" required>
+                    <input type="password" name="password" placeholder="Password" required>
+
+                    <button type="submit">Login to Dashboard</button>
+
+                    <div class="form-footer">
+                        <p>Having trouble accessing your account? <a href="#">Contact Support</a></p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+            
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        function toggleMenu() {
+            const navLinks = document.getElementById('navLinks');
+            navLinks.classList.toggle('active');
+        }
+
+        // Header shadow on scroll
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('.header');
+            if (window.scrollY > 50) {
+                header.style.boxShadow = '0 5px 30px rgba(0, 0, 0, 0.1)';
+            } else {
+                header.style.boxShadow = '0 2px 20px rgba(0, 0, 0, 0.05)';
+            }
+        });
+
+        // Parallax effect
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const animatedBg = document.querySelector('.animated-bg');
+            if (animatedBg) {
+                animatedBg.style.transform = `translateY(${scrolled * 0.3}px)`;
+            }
+        });
+
+        // Form validation
+        document.querySelector('.login-form').addEventListener('submit', function(e) {
+            const inputs = this.querySelectorAll('input[required]');
+            let isValid = true;
+            
+            inputs.forEach(input => {
+                if (!input.value.trim()) {
+                    isValid = false;
+                    input.style.borderColor = '#dc2626';
+                } else {
+                    input.style.borderColor = '#e0e0e0';
+                }
+            });
+            
+            if (!isValid) {
+                e.preventDefault();
+                alert('Please fill in all required fields');
+                return false;
+            }
+        });
+    </script>
+</body>
+</html>

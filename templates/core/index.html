@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BUILD - Property Management Platform</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-text: #0f172a;
+            --secondary-text: #475569;
+            --accent-black: #1a1a1a;
+            --bg-gradient: linear-gradient(135deg, #C1DEE8 0%, #FBD9B9 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--secondary-text);
+            overflow-x: hidden;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Header */
+        header {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255,255,255,0.4);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.2rem 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: var(--primary-text);
+            text-decoration: none;
+        }
+
+        .logo-svg {
+            width: 28px;
+            height: 28px;
+            color: var(--accent-black);
+        }
+
+        nav {
+            display: flex;
+            gap: 2.5rem;
+            align-items: center;
+        }
+
+        nav a {
+            color: var(--secondary-text);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: color 0.2s ease;
+            position: relative;
+        }
+
+        nav a:hover {
+            color: var(--primary-text);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .search-icon {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            color: var(--secondary-text);
+            transition: color 0.2s ease;
+        }
+
+        .search-icon:hover {
+            color: var(--primary-text);
+        }
+
+        .header-btn {
+            padding: 0.75rem 1.5rem;
+            border: 1px solid rgba(0,0,0,0.1);
+            background: rgba(255,255,255,0.5);
+            color: var(--primary-text);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .header-btn:hover {
+            border-color: var(--accent-black);
+            background: rgba(255,255,255,0.9);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: calc(100vh - 85px);
+            position: relative;
+            overflow: hidden;
+            padding: 0 2rem;
+            display: flex;
+            align-items: flex-start; 
+        }
+
+        .hero-container {
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 0.9fr 1.1fr;
+            gap: 2rem;
+            padding-top: 5rem;
+        }
+
+        .hero-content {
+            z-index: 2;
+            padding-top: 1rem;
+        }
+
+        .hero-tag {
+            display: inline-block;
+            font-size: 0.85rem;
+            color: #475569;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 8px 14px;
+            border-radius: 6px;
+            margin-bottom: 1.8rem;
+            font-weight: 600;
+            border: 1px solid rgba(0,0,0,0.06);
+            backdrop-filter: blur(4px);
+        }
+
+        .hero-title {
+            font-size: 4.5rem;
+            font-weight: 800;
+            line-height: 1.05;
+            margin-bottom: 2rem;
+            color: var(--primary-text);
+            letter-spacing: -2px;
+        }
+
+        .hero-description {
+            font-size: 1.125rem;
+            color: var(--secondary-text);
+            margin-bottom: 3.5rem;
+            max-width: 460px;
+            line-height: 1.7;
+            font-weight: 400;
+        }
+
+        /* Buttons */
+        .button-group {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-buyer {
+            background: var(--accent-black);
+            color: white;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-buyer:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-seller {
+            background: rgba(255,255,255,0.8);
+            color: var(--primary-text);
+            border: 1px solid #cbd5e1;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-seller:hover {
+            background: white;
+            border-color: var(--primary-text);
+            transform: translateY(-2px);
+        }
+
+        .icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* 3D Image Styling */
+        .hero-image-wrapper {
+            position: relative;
+            height: 800px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            margin-top: -50px;
+        }
+
+        .image-3d {
+            width: 130%;
+            max-width: none;
+            height: auto;
+            object-fit: contain;
+            filter: drop-shadow(0 40px 80px rgba(0, 0, 0, 0.25));
+            /* Adjusted: Increased scale to 1.2 and reduced left shift to -30px to fill right space */
+            transform: scale(1.2) translateX(-30px); 
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .hero-container {
+                grid-template-columns: 1fr;
+                text-align: center;
+                padding-top: 3rem;
+            }
+            .hero-content {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            .hero-title {
+                font-size: 3.5rem;
+            }
+            .hero-image-wrapper {
+                height: 500px;
+                margin-top: 0;
+            }
+            .image-3d {
+                width: 100%;
+                transform: scale(1);
+            }
+        }
+
+        @media (max-width: 768px) {
+            nav, .header-actions button:not(.mobile-menu-btn) {
+                display: none;
+            }
+            .hero-title {
+                font-size: 2.8rem;
+            }
+            .button-group {
+                flex-direction: column;
+                width: 100%;
+            }
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-container">
+            <a href="#" class="logo">
+                <svg class="logo-svg" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H7v-2h5v2zm0-4H7v-2h5v2zm0-4H7V7h5v2zm5 8h-3v-2h3v2zm0-4h-3v-2h3v2zm0-4h-3V7h3v2z"/>
+                </svg>
+                <span>BUILD</span>
+            </a>
+            
+            <nav>
+                <a href="#">About us</a>
+                <a href="#">Properties</a>
+                <a href="#">Agents</a>
+                <a href="#">Services</a>
+                <a href="#">Join us</a>
+            </nav>
+
+            <div class="header-actions">
+                <button class="header-btn" id="adminBtn">Admin</button>
+                <button class="header-btn" style="border-color: #000;">Contact us</button>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="hero-container">
+            
+            <div class="hero-content">
+                <span class="hero-tag">Welcome to BuildPro</span>
+                <h1 class="hero-title">Manage Your<br>Property</h1>
+                <p class="hero-description">
+                    Tue dere bly ments tnis a ths by coasband by tb the promage Nenant tny wals be gonae hermet.
+                </p>
+                
+                <div class="button-group">
+                    <button class="btn btn-buyer" id="buyerBtn" >
+                        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                        </svg>
+                        I'm a Buyer
+                    </button>
+                    <button class="btn btn-seller" id="sellerBtn">
+                        I'm a Seller
+                        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-left: 5px;">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="hero-image-wrapper">
+                <img src="{% static 'images/home.png' %}" alt="Modern House Render" class="image-3d">
+            </div>
+
+        </div>
+    </section>
+    <script>
+        document.getElementById("buyerBtn").addEventListener("click", () => {
+            window.location.href = "{% url 'buyer_landing_page' %}";
+        });
+
+        document.getElementById("sellerBtn").addEventListener("click", () => {
+            window.location.href = "{% url 'seller_landing_page' %}";
+        });
+
+        document.getElementById("adminBtn").addEventListener("click", () => {
+            window.location.href = "{% url 'admin_landing_page' %}";
+        });
+    </script>
+</body>
+</html>

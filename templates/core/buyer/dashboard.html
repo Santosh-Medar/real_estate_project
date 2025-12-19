@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BUILD - Buyer Dashboard</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            /* Theme Colors */
+            --primary-text: #0f172a;
+            --secondary-text: #64748b;
+            --accent-black: #1a1a1a;
+            --bg-gradient: linear-gradient(135deg, #C1DEE8 0%, #FBD9B9 100%);
+            
+            /* Glassmorphism Variables */
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.5);
+            --card-hover-shadow: 0 12px 40px rgba(0,0,0,0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-gradient);
+            color: var(--primary-text);
+            height: 100vh;
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- Header --- */
+        .header {
+            height: 70px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            border-bottom: var(--glass-border);
+            padding: 0 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+        }
+
+        .logo {
+            font-size: 1.4rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: var(--primary-text);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav {
+            display: flex;
+            gap: 24px;
+        }
+
+        .nav a {
+            text-decoration: none;
+            color: var(--secondary-text);
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav a:hover, .nav a.active {
+            color: var(--accent-black);
+            font-weight: 600;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .notification-btn {
+            background: white;
+            border: 1px solid rgba(0,0,0,0.05);
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            color: var(--secondary-text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .notification-btn:hover {
+            color: var(--accent-black);
+            transform: scale(1.05);
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            border: 2px solid white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .user-avatar::after {
+            content: '';
+            display: block;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://ui-avatars.com/api/?name=Alex+Doe&background=1a1a1a&color=fff');
+            background-size: cover;
+        }
+
+        /* --- Search & Filter --- */
+        .search-section {
+            padding-top: 70px; /* Header offset */
+            background: rgba(255,255,255,0.4);
+            backdrop-filter: blur(8px);
+            border-bottom: var(--glass-border);
+            padding: 86px 32px 16px; /* 70px header + 16px padding */
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            position: relative;
+            z-index: 500;
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 8px;
+            width: 300px;
+            margin-right: 12px;
+            margin-bottom: 0;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 10px 16px;
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 50px;
+            font-size: 14px;
+            outline: none;
+            font-family: 'Inter', sans-serif;
+            background: white;
+        }
+
+        .search-btn {
+            background: var(--accent-black);
+            color: white;
+            border: none;
+            padding: 0 16px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-dropdown {
+            position: relative;
+        }
+
+        .filter-btn {
+            background: white;
+            border: 1px solid rgba(0,0,0,0.1);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--primary-text);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--accent-black);
+        }
+
+        .filter-btn::after {
+            content: '▼';
+            font-size: 8px;
+            color: #94a3b8;
+        }
+
+        /* Dropdowns */
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 110%;
+            left: 0;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            min-width: 200px;
+            z-index: 1000;
+            padding: 8px;
+        }
+
+        .dropdown-content.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 10px 12px;
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 13px;
+            color: var(--secondary-text);
+        }
+
+        .dropdown-item:hover {
+            background: #f1f5f9;
+            color: var(--primary-text);
+        }
+
+        .price-inputs {
+            padding: 8px;
+        }
+        
+        .price-inputs input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .apply-btn {
+            width: 100%;
+            background: var(--accent-black);
+            color: white;
+            border: none;
+            padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* --- Main Content --- */
+        .main-content {
+            display: flex;
+            height: calc(100vh - 140px); /* Adjust based on header+filter height */
+            overflow: hidden;
+        }
+
+        /* Map Section (35% Width) */
+        .map-section {
+            width: 35%;
+            position: relative;
+            background: #eef2f6;
+            border-right: 1px solid rgba(255,255,255,0.5);
+        }
+
+        .map-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+            background: #f8fafc;
+            background-image: 
+                linear-gradient(#e2e8f0 1px, transparent 1px), 
+                linear-gradient(90deg, #e2e8f0 1px, transparent 1px);
+            background-size: 40px 40px;
+            position: relative;
+        }
+
+        .map-controls {
+            position: absolute;
+            bottom: 24px;
+            left: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 10;
+        }
+
+        .map-control-btn {
+            width: 36px;
+            height: 36px;
+            background: white;
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-text);
+        }
+
+        .map-marker {
+            position: absolute;
+            cursor: pointer;
+            transform: translate(-50%, -50%);
+            transition: transform 0.3s;
+        }
+
+        .marker-pin {
+            width: 40px;
+            height: 40px;
+            background: var(--accent-black);
+            border: 3px solid white;
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-45deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .marker-pin svg {
+            transform: rotate(45deg);
+            width: 16px;
+            height: 16px;
+            color: white;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+        }
+
+        .map-marker:hover {
+            transform: scale(1.1) translateY(-5px);
+            z-index: 10;
+        }
+
+        /* Listings Section (65% Width) */
+        .listings-section {
+            width: 65%;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .listings-header {
+            padding: 24px 32px 16px;
+        }
+
+        .listings-header h1 {
+            font-size: 1.5rem;
+            margin-bottom: 4px;
+            font-weight: 700;
+            color: var(--primary-text);
+        }
+
+        .listings-header p {
+            color: var(--secondary-text);
+            font-size: 14px;
+        }
+
+        .listings-grid {
+            padding: 0 32px 32px;
+            flex: 1; /* Pushes footer down */
+        }
+
+        .properties-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        /* Property Card */
+        .property-card {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255,255,255,0.6);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .property-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--card-hover-shadow);
+            background: white;
+        }
+
+        .property-image {
+            position: relative;
+            height: 200px;
+            overflow: hidden;
+        }
+
+        .property-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .property-card:hover .property-image img {
+            transform: scale(1.05);
+        }
+
+        /* Favorite Button */
+        .favorite-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 32px;
+            height: 32px;
+            background: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            transition: transform 0.2s;
+            z-index: 5;
+        }
+
+        .favorite-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .favorite-btn svg {
+            width: 18px;
+            height: 18px;
+            fill: none;
+            stroke: var(--primary-text);
+            stroke-width: 2;
+        }
+
+        .favorite-btn.active svg {
+            fill: #ef4444;
+            stroke: #ef4444;
+        }
+
+        .property-details {
+            padding: 20px;
+        }
+
+        .property-price {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--primary-text);
+            margin-bottom: 4px;
+        }
+
+        .property-location {
+            font-size: 0.9rem;
+            color: var(--secondary-text);
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+
+        .property-stats {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+            font-size: 0.85rem;
+            color: var(--secondary-text);
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .stat-icon {
+            width: 16px;
+            height: 16px;
+            color: #94a3b8;
+        }
+
+        .property-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .tour-btn {
+            flex: 1;
+            background: var(--accent-black);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: opacity 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .tour-btn:hover {
+            opacity: 0.9;
+        }
+
+        .more-btn {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-text);
+        }
+
+        .more-btn:hover {
+            border-color: var(--accent-black);
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 24px;
+        }
+
+        .page-btn {
+            width: 36px;
+            height: 36px;
+            border: 1px solid rgba(0,0,0,0.1);
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .page-btn.active {
+            background: var(--accent-black);
+            color: white;
+            border-color: var(--accent-black);
+        }
+
+        .page-next {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            padding: 8px;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--accent-black);
+            color: white;
+            padding: 40px 32px 24px;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            max-width: 1400px;
+            margin: 0 auto 32px;
+        }
+
+        .footer-logo {
+            font-size: 24px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .footer-section h3 {
+            font-size: 14px;
+            margin-bottom: 16px;
+            font-weight: 700;
+            opacity: 0.7;
+            text-transform: uppercase;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .footer-links a {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            font-size: 13px;
+            color: rgba(255,255,255,0.5);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="header-left">
+            <a href="#" class="logo">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H7v-2h5v2zm0-4H7v-2h5v2zm0-4H7V7h5v2zm5 8h-3v-2h3v2zm0-4h-3v-2h3v2zm0-4h-3V7h3v2z"/></svg>
+                <span>BUILD</span>
+            </a>
+            <nav class="nav">
+                           </nav>
+        </div>
+        <div class="header-right">
+    <button class="notification-btn" title="Saved Properties">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+        </svg>
+    </button>
+    <div class="user-avatar">
+<div class="user-avatar"></div>    </div>
+</div>
+    </header>
+
+    <section class="search-section">
+        <div class="search-bar">
+            <input type="text" class="search-input" value="Atlanta, GA" placeholder="Enter location...">
+            <button class="search-btn">→</button>
+        </div>
+        <div class="filter-bar">
+            <div class="filter-dropdown">
+                <button class="filter-btn" onclick="toggleDropdown('country')">Country</button>
+                <div class="dropdown-content" id="country-dropdown">
+                    <div class="dropdown-item">USA</div>
+                    <div class="dropdown-item">Canada</div>
+                    <div class="dropdown-item">UK</div>
+                </div>
+            </div>
+            <div class="filter-dropdown">
+                <button class="filter-btn" onclick="toggleDropdown('state')">State</button>
+                <div class="dropdown-content" id="state-dropdown">
+                    <div class="dropdown-item">California</div>
+                    <div class="dropdown-item">New York</div>
+                    <div class="dropdown-item">Georgia</div>
+                </div>
+            </div>
+            <div class="filter-dropdown">
+                <button class="filter-btn" onclick="toggleDropdown('town')">Town</button>
+                <div class="dropdown-content" id="town-dropdown">
+                    <div class="dropdown-item">Atlanta</div>
+                    <div class="dropdown-item">Savannah</div>
+                    <div class="dropdown-item">Marietta</div>
+                </div>
+            </div>
+            <div class="filter-dropdown">
+                <button class="filter-btn" onclick="toggleDropdown('type')">Property Type</button>
+                <div class="dropdown-content" id="type-dropdown">
+                    <div class="dropdown-item">All Types</div>
+                    <div class="dropdown-item">Building (House/Condo)</div>
+                    <div class="dropdown-item">Land (Plot)</div>
+                </div>
+            </div>
+            <div class="filter-dropdown">
+                <button class="filter-btn" onclick="toggleDropdown('price')">Price</button>
+                <div class="dropdown-content" id="price-dropdown">
+                    <div class="price-inputs">
+                        <input type="number" placeholder="Min Price" id="minPrice">
+                        <input type="number" placeholder="Max Price" id="maxPrice">
+                        <button class="apply-btn" onclick="applyFilters()">Apply</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="main-content">
+        <div class="listings-section">
+            <div class="listings-header">
+                <h1>Properties for Sale</h1>
+                <p>Showing 4 results based on your filters</p>
+            </div>
+            
+            <div class="listings-grid">
+                <div class="properties-grid" id="propertiesGrid">
+                    </div>
+                
+                <div class="pagination">
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn">2</button>
+                    <button class="page-next">›</button>
+                </div>
+            </div>
+
+            <footer class="footer">
+                <div class="footer-content">
+                    <div>
+                        <div class="footer-logo">
+                            <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24" style="color:white"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H7v-2h5v2zm0-4H7v-2h5v2zm0-4H7V7h5v2zm5 8h-3v-2h3v2zm0-4h-3v-2h3v2zm0-4h-3V7h3v2z"/></svg>
+                            ESTATEA
+                        </div>
+                    </div>
+                    <div class="footer-section">
+                        <h3>Quick Links</h3>
+                        <div class="footer-links">
+                            <a href="#">Home</a>
+                            <a href="#">About Us</a>
+                            <a href="#">Blog</a>
+                            <a href="#">Contact</a>
+                        </div>
+                    </div>
+                    <div class="footer-section">
+                        <h3>Support</h3>
+                        <div class="footer-links">
+                            <a href="#">Help Center</a>
+                            <a href="#">Terms of Service</a>
+                            <a href="#">Privacy Policy</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    © 2025 EstateA All rights reserved.
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        async function fetchAllProperties() {
+            const response = await fetch("/api/properties/all/");
+            return await response.json();
+        }
+
+        function toggleDropdown(id) {
+            const dropdown = document.getElementById(id + '-dropdown');
+            const allDropdowns = document.querySelectorAll('.dropdown-content');
+            allDropdowns.forEach(dd => { if(dd !== dropdown) dd.classList.remove('show'); });
+            dropdown.classList.toggle('show');
+        }
+        
+        window.onclick = function(event) {
+            if (!event.target.matches('.filter-btn')) {
+                document.querySelectorAll('.dropdown-content').forEach(dd => dd.classList.remove('show'));
+            }
+        }
+
+        async function renderProperties() {
+            const grid = document.getElementById('propertiesGrid');
+            grid.innerHTML = ""; // clear existing
+    
+            const properties = await fetchAllProperties();
+            properties.forEach(prop => {
+                const card = document.createElement('div');
+                card.className = 'property-card';
+                card.innerHTML = `
+                    <div class="property-image">
+                        <img src="${prop.image}" alt="${prop.type}">
+                        <button class="favorite-btn" onclick="this.classList.toggle('active')">
+                            <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                        </button>
+                    </div>
+                    <div class="property-details">
+                        <div class="property-price">$${prop.price.toLocaleString()}</div>
+                        <div class="property-location">${prop.location}</div>
+                        <div class="property-stats">
+                            <div class="stat-item">
+                                <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+                                ${prop.beds} bd
+                            </div>
+                            <div class="stat-item">
+                                <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="6" width="18" height="14" rx="2"></rect></svg>
+                                ${prop.baths} ba
+                            </div>
+                            <div class="stat-item">
+                                <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="1" y="3" width="22" height="5"></rect></svg>
+                                ${prop.sqft}
+                            </div>
+                        </div>
+                        <div class="property-actions">
+                            <button class="tour-btn" onclick="window.location.href='/property/view/${prop.id}/'">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                                Request Tour
+                            </button>
+                            <button class="more-btn">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', renderProperties);
+    </script>
+</body>
+</html>
